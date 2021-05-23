@@ -51,7 +51,7 @@ def gen_input():
 
             for i in list(range(1,25)):
                 try:
-                    a_data = np.genfromtxt(file_name + "sub_" + str(i) + ".csv", delimiter=',', skip_header=1)
+                    a_data = np.genfromtxt(file_name + "sub_" + str(i) + ".csv", delimiter=',', skip_header=1, dtype=np.dtype(float))
                     label = tuple([k, num_id, i])
                     a_data = a_data[0:4000,1:]
                     if len(a_data) < 4000:

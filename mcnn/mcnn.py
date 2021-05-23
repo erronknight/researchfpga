@@ -73,7 +73,8 @@ class mcnn(nn.Module):
         # mult-freq [identity, smoothed, smoothest]
         # mult-scale [identity, medium, small]
 
-        x = torch.transpose(x, 0, 1)
+        print(x.shape)
+        x = torch.transpose(x, 1, 2)
 
         print(x.shape)
 
@@ -130,6 +131,9 @@ print("Getting Data...")
 
 classes = pd.NUM_LABELS.keys()
 test_dataset, train_dataset = gen_dataset.gen_test_train_datasets(0.1)
+#train_dataset = torch.from_numpy(train_dataset).float()
+#test_dataset = torch.from_numpy(test_dataset).float()
+
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
@@ -205,6 +209,7 @@ def test(model):
 
 print("Creating Model...")
 model = mcnn()
+model.float()
 print("Model created")
 
 train_model(model)
