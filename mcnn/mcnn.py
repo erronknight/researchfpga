@@ -73,6 +73,8 @@ class mcnn(nn.Module):
         # mult-freq [identity, smoothed, smoothest]
         # mult-scale [identity, medium, small]
 
+        x = torch.transpose(x, 0, 1)
+
         # x identity (1)
         x1 = self.pool1(self.activation(self.conv1(x)))
 
