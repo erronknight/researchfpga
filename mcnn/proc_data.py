@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import torch
 
 LOGGER_ON = False
 
@@ -145,16 +146,19 @@ def downsample_data(data, k_value):
 
 def smooth_data_tss(d, data_size, wdw):
     sm_d = []
-    window = [[]] * data_size
+    window = [[]] * (data_size+1)
 
     for row in d.data:
-        sm_row = [None] * data_size
+        print(len(row))
+        sm_row = [None] * (data_size*1)
         for i,val in enumerate(row):
             # if i > (wdw//2):
+            print(i)
             window[i].append(val)
             if len(window[i]) > wdw:
                 window[i].pop(0)
-            sm_row[i] = [np.mean(window[i])]
+            #print(window[i][0])
+            sm_row[i] = [torch.mean(window[i][0])]
         sm_d.append(sm_row)
     
     sm_tss = time_series_sample(sm_d, d.label)
