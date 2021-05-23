@@ -129,6 +129,25 @@ def smooth_data(data, data_size, wdw):
         sm_data.append(sm_tss)
     return sm_data
 
+def smooth_data_ten(data, data_size, wdw):
+    sm_data = []
+    for d in data:
+        sm_d = []
+        window = [[]] * data_size
+
+        for row in d:
+            sm_row = [None] * data_size
+            for i,val in enumerate(row):
+                # if i > (wdw//2):
+                window[i].append(val)
+                if len(window[i]) > wdw:
+                    window[i].pop(0)
+                sm_row[i] = [torch.mean(window[i][0])]
+            sm_d.append(sm_row)
+        
+        sm_data.append(sm_d)
+    return sm_data
+
 def downsample_data(data, k_value):
     # every kth value
     dwns_data = []
@@ -142,6 +161,20 @@ def downsample_data(data, k_value):
             count = count + k_value
         dwns_tss = time_series_sample(dwns_d, d.label)
         dwns_data.append(dwns_tss)
+    return dwns_data
+
+def downsample_data_ten(data, k_value):
+    # every kth value
+    dwns_data = []
+    for d in data:
+        dwns_d = []
+        count = 0
+        d_len = len(d)
+        while count < d_len:
+            row = d[count]
+            dwns_d.append(row)
+            count = count + k_value
+        dwns_data.append(dwns_d)
     return dwns_data
 
 def smooth_data_tss(d, data_size, wdw):

@@ -74,10 +74,10 @@ class mcnn(nn.Module):
         # mult-scale [identity, medium, small]
 
         print(x.shape)
-        x_sm1 = pd.smooth_data_tss(x, DATA_SIZE, self.window1)
-        x_sm2 = pd.smooth_data_tss(x, DATA_SIZE, self.window2)
-        x_dwn1 = pd.downsample_data_tss(x, self.k1)
-        x_dwn2 = pd.downsample_data_tss(x, self.k2)
+        x_sm1 = pd.smooth_data_ten(x, DATA_SIZE, self.window1)
+        x_sm2 = pd.smooth_data_ten(x, DATA_SIZE, self.window2)
+        x_dwn1 = pd.downsample_data_ten(x, self.k1)
+        x_dwn2 = pd.downsample_data_ten(x, self.k2)
 
         x = torch.transpose(x, 1, 2)
         x_sm1 = torch.transpose(x_sm1, 1, 2)
