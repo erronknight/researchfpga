@@ -82,6 +82,20 @@ def data_stats(data):
     print("max val: \t" + str(maxi))
     print("min val: \t" + str(mini))
 
+def data_dist(data):
+    # 300, ... , 17000
+    # 334, 50
+    aaa = []
+    distro = [0] * 50
+    for datum in data:
+        le = len(datum.data)
+        i = (le - 300)//334
+        distro[i] = distro[i] + 1
+        aaa.append(le)
+    print(distro)
+    print(np.median(aaa))
+    print(sorted(aaa))
+
 # Identity (1)
 # Smoothing (moving average) (2)
 # Downsampling (2)
@@ -160,6 +174,9 @@ def downsample_data_tss(d, k_value):
 # min val:        377
 
 dat = gen_input()
+data_stats(dat)
+data_dist(dat)
+
 smdat = smooth_data(dat, 12, 5)
 dwndat = downsample_data(dat, 5)
 

@@ -2,13 +2,20 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import random
 
 import proc_data as pd
 
 pooling_factor = [2, 3, 5]
 DATA_SIZE = 12
 n_filters = 10
+filter_sizes = [24, 16, 8]
+filter_global = 24
+num_classes = len(pd.LABELS.keys())
 
+fc_vals = [30, 10]
+
+SEED = 123456 # same as brevitas library
 
 # Define model
 class mcnn(nn.Module):
@@ -23,24 +30,25 @@ class mcnn(nn.Module):
 
         # TODO
         # identity
-        self.conv1 = nn.Conv1d()
+        self.conv1 = nn.Conv1d(DATA_SIZE, n_filters, filter_sizes[0])
 
         # smoothing
-        self.conv_sm1 = nn.Conv1d()
-        self.conv_sm2 = nn.Conv1d()
+        self.conv_sm1 = nn.Conv1d(DATA_SIZE, n_filters, filter_sizes[1])
+        self.conv_sm2 = nn.Conv1d(DATA_SIZE, n_filters, filter_sizes[2])
         
         # downsampling
-        self.conv_dwn1 = nn.Conv1d()
-        self.conv_dwn2 = nn.Conv1d()
+        self.conv_dwn1 = nn.Conv1d(DATA_SIZE, n_filters, filter_sizes[1])
+        self.conv_dwn2 = nn.Conv1d(DATA_SIZE, n_filters, filter_sizes[2])
         
-        self.pool1 = nn.MaxPool1d()
+        # self.pool1 = nn.MaxPool1d()
+        self.pool1 = nn.AdaptiveMaxPool1d(n_filters)
 
-        self.conv_global = nn.Conv1d()
-        self.pool_global = nn.MaxPool1d()
+        self.conv_global = nn.Conv1d(n_filters, n_filters, filter_global)
+        self.pool_global = nn.AdaptiveMaxPool1d(n_filters)
 
-        self.fc1 = nn.Linear()
-        self.fc2 = nn.Linear()
-        self.fc3 = nn.Linear()
+        self.fc1 = nn.Linear(n_filters*filter_global, fc_vals[0])
+        self.fc2 = nn.Linear(fc_vals[0], fc_vals[1])
+        self.fc3 = nn.Linear(fc_vals[1], num_classes)
 
         # self.conv1 = nn.Conv2d(3, 6, 5)
         # self.pool = nn.MaxPool2d(2, 2)
@@ -100,3 +108,9 @@ class mcnn(nn.Module):
 # train model
 
 # test model
+
+def training():
+    random.seed(SEED)
+    torch.manual_seed(SEED)
+
+    
