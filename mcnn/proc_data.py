@@ -173,6 +173,7 @@ def downsample_data_tss(d, k_value):
 # max val:        16424
 # min val:        377
 
+'''
 dat = gen_input()
 data_stats(dat)
 data_dist(dat)
@@ -183,6 +184,7 @@ dwndat = downsample_data(dat, 5)
 data_stats(smdat)
 print("---")
 data_stats(dwndat)
+'''
 
 # print(len(dat[0].data[0]))
 # data_stats(dat)
