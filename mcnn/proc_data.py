@@ -40,7 +40,7 @@ class time_series_sample:
     def __init__(self, data, label):
         self.data = data
         self.label = label
-        self.class_label = label[0]
+        self.class_label = NUM_LABELS[label[0]]
 
 def gen_input():
     input_data = []

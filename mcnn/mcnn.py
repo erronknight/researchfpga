@@ -51,7 +51,7 @@ class mcnn(nn.Module):
         self.conv_global = nn.Conv1d(n_filters, glob_filt, filter_global)
         self.pool_global = nn.AdaptiveMaxPool1d(n_filters)
 
-        self.fc1 = nn.Linear(2000, fc_vals[0])
+        self.fc1 = nn.Linear(200, fc_vals[0])
         self.fc2 = nn.Linear(fc_vals[0], fc_vals[1])
         self.fc3 = nn.Linear(fc_vals[1], num_classes)
 
@@ -74,7 +74,7 @@ class mcnn(nn.Module):
         # mult-freq [identity, smoothed, smoothest]
         # mult-scale [identity, medium, small]
 
-        print(x.shape)
+        #print(x.shape)
         #print(x)
         x_sm1 = pd.smooth_data_ten(x, DATA_SIZE, self.window1)
         x_sm2 = pd.smooth_data_ten(x, DATA_SIZE, self.window2)
@@ -92,12 +92,12 @@ class mcnn(nn.Module):
         x_dwn2 = torch.transpose(x_dwn2, 1, 2)
 
 
-        print(x.shape)
+        #print(x.shape)
 
         # x identity (1)
         x1 = self.pool1(self.activation(self.conv1(x)))
 
-        print(x_sm1.shape)
+        #print(x_sm1.shape)
         # x smoothing (moving average) (2)
         x2 = self.conv_sm1(torch.squeeze(x_sm1))
         #print(x2.shape)
@@ -119,15 +119,15 @@ class mcnn(nn.Module):
         xcat = torch.cat((x1, x2, x3, x4, x5), 2)
         #xcat = torch.cat((x1,x2,x4))
 
-        print(xcat.shape)
+        #print(xcat.shape)
 
         # conv1d and maxpool
         x = self.pool_global(self.activation(self.conv_global(xcat)))
 
-        print(x.shape)
+        #print(x.shape)
 
         # TODO
-        x = x.view(-1, 2000)
+        x = x.view(10, 200)
 
         # 2 fc then fc with softmax (self.fullyconnectedlayer(x))
         x = self.activation(self.fc1(x))
@@ -147,12 +147,12 @@ class mcnn(nn.Module):
 #     def __init__(self):
 
 batch_size = 10
-num_epochs = 4
-learning_rate = 0.1
+num_epochs = 100 
+learning_rate = 0.02
 
 print("Getting Data...")
 
-classes = pd.NUM_LABELS.keys()
+classes = tuple(pd.NUM_LABELS.keys())
 test_dataset, train_dataset = gen_dataset.gen_test_train_datasets(0.1)
 #train_dataset = torch.from_numpy(train_dataset).float()
 #test_dataset = torch.from_numpy(test_dataset).float()
