@@ -209,7 +209,7 @@ def test(model):
 
 print("Creating Model...")
 model = mcnn()
-model.float()
+model.double()
 print("Model created")
 
 train_model(model)
