@@ -120,11 +120,14 @@ batch_size = 10
 num_epochs = 4
 learning_rate = 0.1
 
+print("Getting Data...")
+
 classes = pd.NUM_LABELS.keys()
 test_dataset, train_dataset = gen_dataset.gen_test_train_datasets(0.1)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
+print("Data setup complete...")
 
 def train_model(model):
     random.seed(SEED)
@@ -194,6 +197,9 @@ def test(model):
                 acc = 100.0 * n_class_correct[i] / n_class_samples[i]
                 print(f'Accuracy of {classes[i]}: {acc} %')
 
+print("Creating Model...")
 model = mcnn()
+print("Model created")
+
 train_model(model)
 test(model)
