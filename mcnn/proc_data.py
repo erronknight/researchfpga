@@ -53,7 +53,10 @@ def gen_input():
                 try:
                     a_data = np.genfromtxt(file_name + "sub_" + str(i) + ".csv", delimiter=',', skip_header=1)
                     label = tuple([k, num_id, i])
-                    a_data = a_data[:,1:]
+                    a_data = a_data[0:4000,1:]
+                    if len(a_data) < 4000:
+                        df = (4000 - len(a_data))
+                        a_data.extend([[0]* len(a_data[0])] * df)
                     new_tss = time_series_sample(a_data, label)
                     input_data.append(new_tss)
                     if LOGGER_ON:
