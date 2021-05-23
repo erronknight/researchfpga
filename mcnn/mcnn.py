@@ -5,6 +5,10 @@ import torch.nn.functional as F
 import random
 
 import proc_data as pd
+import gen_dataset
+import utils
+
+import time
 
 pooling_factor = [2, 3, 5]
 DATA_SIZE = 12
@@ -109,8 +113,87 @@ class mcnn(nn.Module):
 
 # test model
 
-def training():
+# class MCNNTrainer():
+#     def __init__(self):
+
+batch_size = 10
+num_epochs = 4
+learning_rate = 0.1
+
+classes = pd.NUM_LABELS.keys()
+test_dataset, train_dataset = gen_dataset.gen_test_train_datasets(0.1)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+
+def train_model(model):
     random.seed(SEED)
     torch.manual_seed(SEED)
 
-    
+    # loss function + handles the softmax value (present in the final fully connected layer)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+
+    print("Start Training...")
+    n_total_steps = len(train_loader)
+    print(n_total_steps)
+    for epoch in range(num_epochs):
+        for i, (data, labels) in enumerate(train_loader):
+            # data = data.to(device)
+            # labels = labels.to(device)
+
+            # Forward pass
+            outputs = model(data)
+            loss = criterion(outputs, labels)
+
+            # Backward and optimize
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if (i+1) % 5 == 0:
+                print (f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
+
+    print('Finished Training')
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    MOD_PATH = f'./cnn{num_epochs}_{timestr}.pth'
+    did_save = utils.save_model(model, MOD_PATH)
+    print("path: \t" + str(MOD_PATH))
+    print("Saved Model: \t" + str(did_save))
+    return model
+
+def test(model):
+    with torch.no_grad():
+        n_correct = 0
+        n_samples = 0
+        n_class_correct = [0 for i in range(len(classes))]
+        n_class_samples = [0 for i in range(len(classes))]
+        for data, labels in test_loader:
+            # data = data.to(device)
+            # labels = labels.to(device)
+            outputs = model(data)
+            # max returns (value ,index)
+            _, predicted = torch.max(outputs, 1)
+            n_samples += labels.size(0)
+            n_correct += (predicted == labels).sum().item()
+            
+            # print(labels)
+            for i in range(len(labels)):
+                # print(i)
+                label = labels[i]
+                pred = predicted[i]
+                if (label == pred):
+                    n_class_correct[label] += 1
+                n_class_samples[label] += 1
+
+        acc = 100.0 * n_correct / n_samples
+        print(f'Accuracy of the network: {acc} %')
+
+        for i in range(len(classes)):
+            if n_class_samples[i] != 0:
+                acc = 100.0 * n_class_correct[i] / n_class_samples[i]
+                print(f'Accuracy of {classes[i]}: {acc} %')
+
+model = mcnn()
+train_model(model)
+test(model)

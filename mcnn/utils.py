@@ -3,11 +3,11 @@ import torch
 import mcnn.mcnn_model as mcnn
 
 # Generate and Save Dataset
-
+# see gen_dataset
 
 # load in model
 def load_model(model_path):
-    model = mcnn(*args, **kwargs)
+    model = mcnn()
     model.load_state_dict(torch.load(model_path))
     model.eval()
     return model
