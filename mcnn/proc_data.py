@@ -1,7 +1,5 @@
 import os
 import numpy as np
-# import torch
-# from torch.utils.data import Dataset, DataLoader
 
 LOGGER_ON = False
 
@@ -43,26 +41,6 @@ class time_series_sample:
         self.label = label
         self.class_label = label[0]
 
-# class WineDataset(Dataset):
-
-#     def __init__(self):
-#         # Initialize data, download, etc.
-#         # read with numpy or pandas
-#         xy = np.loadtxt('./data/wine/wine.csv', delimiter=',', dtype=np.float32, skiprows=1)
-#         self.n_samples = xy.shape[0]
-
-#         # here the first column is the class label, the rest are the features
-#         self.x_data = torch.from_numpy(xy[:, 1:]) # size [n_samples, n_features]
-#         self.y_data = torch.from_numpy(xy[:, [0]]) # size [n_samples, 1]
-
-#     # support indexing such that dataset[i] can be used to get i-th sample
-#     def __getitem__(self, index):
-#         return self.x_data[index], self.y_data[index]
-
-#     # we can call len(dataset) to return the size
-#     def __len__(self):
-#         return self.n_samples
-
 def gen_input():
     input_data = []
     if LOGGER_ON:
@@ -75,6 +53,7 @@ def gen_input():
                 try:
                     a_data = np.genfromtxt(file_name + "sub_" + str(i) + ".csv", delimiter=',', skip_header=1)
                     label = tuple([k, num_id, i])
+                    a_data = a_data[:,1:]
                     new_tss = time_series_sample(a_data, label)
                     input_data.append(new_tss)
                     if LOGGER_ON:
@@ -83,3 +62,110 @@ def gen_input():
                 except:
                     pass
     return input_data
+
+def data_stats(data):
+    # lengths
+    ave = 0
+    maxi = 0
+    mini = 0
+    for datum in data:
+        ave = ave + len(datum.data)
+        if maxi < len(datum.data):
+            maxi = len(datum.data)
+        if mini == 0:
+            mini = len(datum.data)
+        if mini > len(datum.data):
+            mini = len(datum.data)
+    ave = ave / len(data)
+
+    print("average: \t" + str(ave))
+    print("max val: \t" + str(maxi))
+    print("min val: \t" + str(mini))
+
+# Identity (1)
+# Smoothing (moving average) (2)
+# Downsampling (2)
+
+def smooth_data(data, data_size, wdw):
+    sm_data = []
+    for d in data:
+        sm_d = []
+        window = [[]] * data_size
+        # # beginning
+        # dslice = d.data[0:(wdw//2)]
+        # dslice = np.transpose(dslice)
+        # for x in data_size:
+        #     window[x] = dslice[x]
+
+        for row in d.data:
+            sm_row = [None] * data_size
+            for i,val in enumerate(row):
+                # if i > (wdw//2):
+                window[i].append(val)
+                if len(window[i]) > wdw:
+                    window[i].pop(0)
+                sm_row[i] = [np.mean(window[i])]
+            sm_d.append(sm_row)
+        
+        sm_tss = time_series_sample(sm_d, d.label)
+        sm_data.append(sm_tss)
+    return sm_data
+
+def downsample_data(data, k_value):
+    # every kth value
+    dwns_data = []
+    for d in data:
+        dwns_d = []
+        count = 0
+        d_len = len(d.data)
+        while count < d_len:
+            row = d.data[count]
+            dwns_d.append(row)
+            count = count + k_value
+        dwns_tss = time_series_sample(dwns_d, d.label)
+        dwns_data.append(dwns_tss)
+    return dwns_data
+
+def smooth_data_tss(d, data_size, wdw):
+    sm_d = []
+    window = [[]] * data_size
+
+    for row in d.data:
+        sm_row = [None] * data_size
+        for i,val in enumerate(row):
+            # if i > (wdw//2):
+            window[i].append(val)
+            if len(window[i]) > wdw:
+                window[i].pop(0)
+            sm_row[i] = [np.mean(window[i])]
+        sm_d.append(sm_row)
+    
+    sm_tss = time_series_sample(sm_d, d.label)
+    return sm_tss
+
+def downsample_data_tss(d, k_value):
+    # every kth value
+    dwns_d = []
+    count = 0
+    d_len = len(d.data)
+    while count < d_len:
+        row = d.data[count]
+        dwns_d.append(row)
+        count = count + k_value
+    dwns_tss = time_series_sample(dwns_d, d.label)
+    return dwns_tss
+
+# average:        3924.625
+# max val:        16424
+# min val:        377
+
+dat = gen_input()
+smdat = smooth_data(dat, 12, 5)
+dwndat = downsample_data(dat, 5)
+
+data_stats(smdat)
+print("---")
+data_stats(dwndat)
+
+# print(len(dat[0].data[0]))
+# data_stats(dat)
