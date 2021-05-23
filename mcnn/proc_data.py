@@ -146,7 +146,7 @@ def smooth_data_ten(data, data_size, wdw):
             sm_d.append(sm_row)
         
         sm_data.append(sm_d)
-    return torch.FloatTensor(sm_data)
+    return torch.DoubleTensor(sm_data)
 
 def downsample_data(data, k_value):
     # every kth value
@@ -172,12 +172,13 @@ def downsample_data_ten(data, k_value):
         d_len = len(d)
         while count < d_len:
             row = d[count]
+            row = [x for x in row]
             dwns_d.append(row)
             count = count + k_value
         dwns_data.append(dwns_d)
-        print(dwns_data)
-    #return torch.FloatTensor(dwns_data)
-    return dwns_data
+        #print(dwns_data)
+    return torch.DoubleTensor(dwns_data)
+    #return dwns_data
 
 def smooth_data_tss(d, data_size, wdw):
     sm_d = []

@@ -13,8 +13,9 @@ import time
 pooling_factor = [2, 3, 5]
 DATA_SIZE = 12
 n_filters = 10
-filter_sizes = [24, 16, 8]
-filter_global = 24
+filter_sizes = [16, 8, 4]
+filter_global = 16
+glob_filt = 20
 num_classes = len(pd.LABELS.keys())
 
 fc_vals = [30, 10]
@@ -47,10 +48,10 @@ class mcnn(nn.Module):
         # self.pool1 = nn.MaxPool1d()
         self.pool1 = nn.AdaptiveMaxPool1d(n_filters)
 
-        self.conv_global = nn.Conv1d(n_filters, n_filters, filter_global)
+        self.conv_global = nn.Conv1d(n_filters, glob_filt, filter_global)
         self.pool_global = nn.AdaptiveMaxPool1d(n_filters)
 
-        self.fc1 = nn.Linear(n_filters*filter_global, fc_vals[0])
+        self.fc1 = nn.Linear(2000, fc_vals[0])
         self.fc2 = nn.Linear(fc_vals[0], fc_vals[1])
         self.fc3 = nn.Linear(fc_vals[1], num_classes)
 
@@ -74,18 +75,21 @@ class mcnn(nn.Module):
         # mult-scale [identity, medium, small]
 
         print(x.shape)
+        #print(x)
         x_sm1 = pd.smooth_data_ten(x, DATA_SIZE, self.window1)
-        #x_sm2 = pd.smooth_data_ten(x, DATA_SIZE, self.window2)
+        x_sm2 = pd.smooth_data_ten(x, DATA_SIZE, self.window2)
         x_dwn1 = pd.downsample_data_ten(x, self.k1)
-        #x_dwn2 = pd.downsample_data_ten(x, self.k2)
+        x_dwn2 = pd.downsample_data_ten(x, self.k2)
 
         print("completed branching")
 
         x = torch.transpose(x, 1, 2)
         x_sm1 = torch.transpose(x_sm1, 1, 2)
-        #x_sm2 = torch.transpose(x_sm2, 1, 2)
+        x_sm2 = torch.transpose(x_sm2, 1, 2)
+        #print(x_dwn1)
+        #print(torch.FloatTensor(x_dwn1).shape)
         x_dwn1 = torch.transpose(x_dwn1, 1, 2)
-        #x_dwn2 = torch.transpose(x_dwn2, 1, 2)
+        x_dwn2 = torch.transpose(x_dwn2, 1, 2)
 
 
         print(x.shape)
@@ -93,19 +97,29 @@ class mcnn(nn.Module):
         # x identity (1)
         x1 = self.pool1(self.activation(self.conv1(x)))
 
+        print(x_sm1.shape)
         # x smoothing (moving average) (2)
-        x2 = self.pool2(self.activation(self.conv_sm1(x_sm1)))
-        #x3 = self.pool2(self.activation(self.conv_sm2(x_sm2)))
+        x2 = self.conv_sm1(torch.squeeze(x_sm1))
+        #print(x2.shape)
+        x2 = self.activation(x2)
+        #print(x2.shape)
+        x2 = self.pool1(x2)
+        #print(x2.shape)
+        x3 = torch.squeeze(x_sm2)
+        #x2 = self.pool1(self.activation(self.conv_sm1(x_sm1)))
+        x3 = self.pool1(self.activation(self.conv_sm2(x3)))
 
         # x downsampling (every kth item) (2)
-        x4 = self.pool2(self.activation(self.conv_dwn1(x_dwn1)))
-        #x5 = self.pool2(self.activation(self.conv_dwn2(x_dwn2)))
+        x4 = self.pool1(self.activation(self.conv_dwn1(x_dwn1)))
+        x5 = self.pool1(self.activation(self.conv_dwn2(x_dwn2)))
 
         # conv1d and maxpool for each
 
         # concatenate
-        #xcat = torch.cat((x1, x2, x3, x4, x5))
-        xcat = torch.cat((x1,x2,x4))
+        xcat = torch.cat((x1, x2, x3, x4, x5), 2)
+        #xcat = torch.cat((x1,x2,x4))
+
+        print(xcat.shape)
 
         # conv1d and maxpool
         x = self.pool_global(self.activation(self.conv_global(xcat)))
@@ -113,7 +127,7 @@ class mcnn(nn.Module):
         print(x.shape)
 
         # TODO
-        x = x.view(-1, )
+        x = x.view(-1, 2000)
 
         # 2 fc then fc with softmax (self.fullyconnectedlayer(x))
         x = self.activation(self.fc1(x))
