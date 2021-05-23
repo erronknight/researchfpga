@@ -74,7 +74,17 @@ class mcnn(nn.Module):
         # mult-scale [identity, medium, small]
 
         print(x.shape)
+        x_sm1 = pd.smooth_data_tss(x, DATA_SIZE, self.window1)
+        x_sm2 = pd.smooth_data_tss(x, DATA_SIZE, self.window2)
+        x_dwn1 = pd.downsample_data_tss(x, self.k1)
+        x_dwn2 = pd.downsample_data_tss(x, self.k2)
+
         x = torch.transpose(x, 1, 2)
+        x_sm1 = torch.transpose(x_sm1, 1, 2)
+        x_sm2 = torch.transpose(x_sm2, 1, 2)
+        x_dwn1 = torch.transpose(x_dwn1, 1, 2)
+        x_dwn2 = torch.transpose(x_dwn2, 1, 2)
+
 
         print(x.shape)
 
@@ -82,14 +92,10 @@ class mcnn(nn.Module):
         x1 = self.pool1(self.activation(self.conv1(x)))
 
         # x smoothing (moving average) (2)
-        x_sm1 = pd.smooth_data_tss(x, DATA_SIZE, self.window1)
-        x_sm2 = pd.smooth_data_tss(x, DATA_SIZE, self.window2)
         x2 = self.pool2(self.activation(self.conv_sm1(x_sm1)))
         x3 = self.pool2(self.activation(self.conv_sm2(x_sm2)))
 
         # x downsampling (every kth item) (2)
-        x_dwn1 = pd.downsample_data_tss(x, self.k1)
-        x_dwn2 = pd.downsample_data_tss(x, self.k2)
         x4 = self.pool2(self.activation(self.conv_dwn1(x_dwn1)))
         x5 = self.pool2(self.activation(self.conv_dwn2(x_dwn2)))
 
