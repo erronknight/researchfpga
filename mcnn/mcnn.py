@@ -75,6 +75,8 @@ class mcnn(nn.Module):
 
         x = torch.transpose(x, 0, 1)
 
+        print(x.shape)
+
         # x identity (1)
         x1 = self.pool1(self.activation(self.conv1(x)))
 
@@ -97,6 +99,8 @@ class mcnn(nn.Module):
 
         # conv1d and maxpool
         x = self.pool_global(self.activation(self.conv_global(xcat)))
+
+        print(x.shape)
 
         # TODO
         x = x.view(-1, )
