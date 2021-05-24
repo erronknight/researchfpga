@@ -157,25 +157,6 @@ class mcnn(nn.Module):
 
 # test model
 
-# class MCNNTrainer():
-#     def __init__(self):
-
-batch_size = 10
-num_epochs = 50 
-learning_rate = 0.02
-
-print("Getting Data...")
-
-classes = tuple(pd.NUM_LABELS.keys())
-test_dataset, train_dataset = gen_dataset.gen_test_train_datasets(0.1)
-#train_dataset = torch.from_numpy(train_dataset).float()
-#test_dataset = torch.from_numpy(test_dataset).float()
-
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-print("Data setup complete...")
-
 def train_model(model):
     random.seed(SEED)
     torch.manual_seed(SEED)
@@ -215,7 +196,7 @@ def train_model(model):
     print('Finished Training')
     timestr = time.strftime("%Y%m%d-%H%M%S")
     MOD_PATH = f'./cnn{num_epochs}_{timestr}.pth'
-    did_save = utils.save_model(model, MOD_PATH)
+    did_save = save_model(model, MOD_PATH)
     print("path: \t" + str(MOD_PATH))
     print("Saved Model: \t" + str(did_save))
     return model
@@ -252,10 +233,31 @@ def test(model):
                 acc = 100.0 * n_class_correct[i] / n_class_samples[i]
                 print(f'Accuracy of {classes[i]}: {acc} %')
 
-print("Creating Model...")
-model = mcnn()
-model.double()
-print("Model created")
+batch_size = 10
+num_epochs = 50 
+learning_rate = 0.02
 
-train_model(model)
-test(model)
+if __name__ == 'main':
+
+    print("Getting Data...")
+
+    classes = tuple(pd.NUM_LABELS.keys())
+    test_dataset, train_dataset = gen_dataset.gen_test_train_datasets(0.1)
+    #train_dataset = torch.from_numpy(train_dataset).float()
+    #test_dataset = torch.from_numpy(test_dataset).float()
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    print("Data setup complete...")
+
+    print("Creating Model...")
+    model = mcnn()
+    model.double()
+
+    model = load_model("./cnn50_46_20210524-104056.pth")
+
+    print("Model created")
+
+    # train_model(model)
+    test(model)
