@@ -6,7 +6,6 @@ import random
 
 import proc_data as pd
 import gen_dataset
-import utils
 
 import time
 
@@ -21,6 +20,21 @@ num_classes = len(pd.LABELS.keys())
 fc_vals = [30, 10]
 
 SEED = 123456 # same as brevitas library
+
+# load in model
+def load_model(model_path):
+    model = mcnn()
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
+    return model
+
+# save model
+def save_model(model, model_path):
+    try:
+        torch.save(model.state_dict(), model_path)
+        return True
+    except:
+        return False
 
 # Define model
 class mcnn(nn.Module):
@@ -193,7 +207,7 @@ def train_model(model):
         if epoch % 5 == 0:
             timestr = time.strftime("%Y%m%d-%H%M%S")
             MOD_PATH = f'./cnn{num_epochs}_{epoch+1}_{timestr}.pth'
-            did_save = utils.save_model(model, MOD_PATH)
+            did_save = save_model(model, MOD_PATH)
             print("path: \t" + str(MOD_PATH))
             print("Saved Model: \t" + str(did_save))
 

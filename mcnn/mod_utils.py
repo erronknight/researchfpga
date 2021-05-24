@@ -1,6 +1,6 @@
 
 import torch
-import mcnn.mcnn_model as mcnn
+from mcnn import mcnn
 
 # Generate and Save Dataset
 # see gen_dataset
@@ -19,3 +19,4 @@ def save_model(model, model_path):
         return True
     except:
         return False
+
