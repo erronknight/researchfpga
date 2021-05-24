@@ -31,6 +31,8 @@ def gen_test_train_datasets(test_holdout):
     
     index_list = list(range(in_len))
     test_num = math.floor(test_holdout * in_len)
+    train_num = ((in_len - test_num) // 10) * 10
+    test_num = in_len - train_num
     test_inds = random.sample(index_list, test_num)
     train_inds = [x for x in index_list if x not in test_inds]
 

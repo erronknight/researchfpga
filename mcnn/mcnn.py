@@ -188,7 +188,8 @@ def train_model(model):
             optimizer.step()
 
             if (i+1) % 5 == 0:
-                print (f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
+                print (f"Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}")
+                #print(str(epoch) + "  " + str(i) + "  " + str(loss.item()))
 
     print('Finished Training')
     timestr = time.strftime("%Y%m%d-%H%M%S")

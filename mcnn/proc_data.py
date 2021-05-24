@@ -2,7 +2,7 @@ import os
 import numpy as np
 import torch
 
-LOGGER_ON = False
+LOGGER_ON = False 
 
 LABELS = {
     "dws": "downstairs",
@@ -215,6 +215,10 @@ def downsample_data_tss(d, k_value):
 # average:        3924.625
 # max val:        16424
 # min val:        377
+
+dat = gen_input()
+
+print(len(dat))
 
 '''
 dat = gen_input()
