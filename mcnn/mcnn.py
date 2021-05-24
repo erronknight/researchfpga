@@ -113,7 +113,12 @@ class mcnn(nn.Module):
 
         #print(x_sm1.shape)
         # x smoothing (moving average) (2)
+        #print(len(list(x_sm1.size())))
+        #print(x_sm1.shape)
+        #if len(x_sm1.shape) == 4:
         x2 = self.conv_sm1(torch.squeeze(x_sm1))
+        if len(x2.shape) != 3:
+            x2 = self.conv_sm1(torch.unsqueeze(x_sm1), 0)
         #print(x2.shape)
         x2 = self.activation(x2)
         #print(x2.shape)
