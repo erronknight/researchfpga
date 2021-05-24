@@ -216,9 +216,9 @@ def downsample_data_tss(d, k_value):
 # max val:        16424
 # min val:        377
 
-dat = gen_input()
+#dat = gen_input()
 
-print(len(dat))
+#print(len(dat))
 
 '''
 dat = gen_input()

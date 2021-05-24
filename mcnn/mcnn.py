@@ -237,7 +237,7 @@ batch_size = 10
 num_epochs = 50 
 learning_rate = 0.02
 
-if __name__ == 'main':
+if __name__ == "__main__":
 
     print("Getting Data...")
 
@@ -256,6 +256,7 @@ if __name__ == 'main':
     model.double()
 
     model = load_model("./cnn50_46_20210524-104056.pth")
+    model.double()
 
     print("Model created")
 
