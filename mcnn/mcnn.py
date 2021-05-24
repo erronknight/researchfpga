@@ -85,11 +85,11 @@ class mcnn(nn.Module):
 
         x = torch.transpose(x, 1, 2)
         x_sm1 = torch.transpose(x_sm1, 1, 2)
-        x_sm2 = torch.transpose(x_sm2, 1, 2)
+        #x_sm2 = torch.transpose(x_sm2, 1, 2)
         #print(x_dwn1)
         #print(torch.FloatTensor(x_dwn1).shape)
         x_dwn1 = torch.transpose(x_dwn1, 1, 2)
-        x_dwn2 = torch.transpose(x_dwn2, 1, 2)
+        #x_dwn2 = torch.transpose(x_dwn2, 1, 2)
 
 
         #print(x.shape)
@@ -105,19 +105,19 @@ class mcnn(nn.Module):
         #print(x2.shape)
         x2 = self.pool1(x2)
         #print(x2.shape)
-        x3 = torch.squeeze(x_sm2)
+        #x3 = torch.squeeze(x_sm2)
         #x2 = self.pool1(self.activation(self.conv_sm1(x_sm1)))
-        x3 = self.pool1(self.activation(self.conv_sm2(x3)))
+        #x3 = self.pool1(self.activation(self.conv_sm2(x3)))
 
         # x downsampling (every kth item) (2)
         x4 = self.pool1(self.activation(self.conv_dwn1(x_dwn1)))
-        x5 = self.pool1(self.activation(self.conv_dwn2(x_dwn2)))
+        #x5 = self.pool1(self.activation(self.conv_dwn2(x_dwn2)))
 
         # conv1d and maxpool for each
 
         # concatenate
-        xcat = torch.cat((x1, x2, x3, x4, x5), 2)
-        #xcat = torch.cat((x1,x2,x4))
+        #xcat = torch.cat((x1, x2, x3, x4, x5), 2)
+        xcat = torch.cat((x1,x2,x4), 2)
 
         #print(xcat.shape)
 
@@ -147,7 +147,7 @@ class mcnn(nn.Module):
 #     def __init__(self):
 
 batch_size = 10
-num_epochs = 100 
+num_epochs = 50 
 learning_rate = 0.02
 
 print("Getting Data...")
@@ -190,7 +190,14 @@ def train_model(model):
             if (i+1) % 5 == 0:
                 print (f"Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}")
                 #print(str(epoch) + "  " + str(i) + "  " + str(loss.item()))
+        if epoch % 5 == 0:
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            MOD_PATH = f'./cnn{num_epochs}_{epoch+1}_{timestr}.pth'
+            did_save = utils.save_model(model, MOD_PATH)
+            print("path: \t" + str(MOD_PATH))
+            print("Saved Model: \t" + str(did_save))
 
+        
     print('Finished Training')
     timestr = time.strftime("%Y%m%d-%H%M%S")
     MOD_PATH = f'./cnn{num_epochs}_{timestr}.pth'
